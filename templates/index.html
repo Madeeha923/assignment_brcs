@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Reminder - Book Now</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="nav-content">
+                <h1 class="logo">📅 Appointment Reminder</h1>
+                <div class="nav-links">
+                    <a href="/" class="active">Book Appointment</a>
+                    <a href="/dashboard">View Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-container">
+                <div class="form-card">
+                    <h2>Schedule Your Appointment</h2>
+                    <p class="subtitle">Fill in your details and we'll send you a confirmation</p>
+
+                    <form id="appointmentForm">
+                        <div class="form-group">
+                            <label for="customerName">Full Name</label>
+                            <input 
+                                type="text" 
+                                id="customerName" 
+                                name="customer_name" 
+                                placeholder="John Doe" 
+                                required
+                                minlength="2"
+                            />
+                            <span class="error" id="nameError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input 
+                                type="tel" 
+                                id="phoneNumber" 
+                                name="phone_number" 
+                                placeholder="+1 (555) 123-4567" 
+                                required
+                            />
+                            <span class="help-text">Include country code (e.g., +1 for USA)</span>
+                            <span class="error" id="phoneError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="appointmentTime">Appointment Date & Time</label>
+                            <input 
+                                type="datetime-local" 
+                                id="appointmentTime" 
+                                name="appointment_time" 
+                                required
+                            />
+                            <span class="help-text">Select a future date and time</span>
+                            <span class="error" id="timeError"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            Book Appointment
+                        </button>
+                    </form>
+
+                    <div id="successMessage" class="alert alert-success" style="display: none;">
+                        <div class="alert-icon">✓</div>
+                        <div>
+                            <strong>Appointment Booked!</strong>
+                            <p id="successText"></p>
+                        </div>
+                    </div>
+
+                    <div id="errorMessage" class="alert alert-error" style="display: none;">
+                        <div class="alert-icon">✕</div>
+                        <div>
+                            <strong>Error</strong>
+                            <p id="errorText"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>How It Works</h3>
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Enter Your Details</h4>
+                                <p>Provide your name, phone number, and preferred appointment time</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Get Confirmation</h4>
+                                <p>Receive an instant confirmation message via WhatsApp/SMS</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Automatic Reminder</h4>
+                                <p>Get a reminder message 1 hour before your appointment</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', submitAppointment);
+    </script>
+</body>
+</html>

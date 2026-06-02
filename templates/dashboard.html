@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="nav-content">
+                <h1 class="logo">📅 Appointment Reminder</h1>
+                <div class="nav-links">
+                    <a href="/">Book Appointment</a>
+                    <a href="/dashboard" class="active">View Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h2>Appointment Dashboard</h2>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalAppointments">0</div>
+                            <div class="stat-label">Total Appointments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="upcomingAppointments">0</div>
+                            <div class="stat-label">Upcoming</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="remindersSent">0</div>
+                            <div class="stat-label">Reminders Sent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-filters">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search by name or phone number..."
+                        class="search-input"
+                    />
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button id="refreshBtn" class="btn btn-secondary">Refresh</button>
+                </div>
+
+                <div id="loadingMessage" class="alert alert-info" style="display: none;">
+                    <div class="alert-icon">⟳</div>
+                    <div>Loading appointments...</div>
+                </div>
+
+                <div id="emptyMessage" class="alert alert-info" style="display: none;">
+                    <div class="alert-icon">ℹ️</div>
+                    <div>
+                        <strong>No appointments yet</strong>
+                        <p><a href="/">Book an appointment</a> to get started</p>
+                    </div>
+                </div>
+
+                <div class="appointments-list" id="appointmentsList">
+                    <!-- Appointments will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for appointment details -->
+    <div id="appointmentModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Appointment Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary" id="sendReminderBtn" onclick="sendReminderManually()">Send Reminder Now</button>
+                <button class="btn btn-danger" id="deleteBtn" onclick="deleteAppointment()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <script>
+        // Load appointments on page load
+        loadAppointments();
+
+        // Refresh every 30 seconds
+        setInterval(loadAppointments, 30000);
+
+        // Event listeners
+        document.getElementById('refreshBtn').addEventListener('click', loadAppointments);
+        document.getElementById('searchInput').addEventListener('input', filterAppointments);
+        document.getElementById('statusFilter').addEventListener('change', filterAppointments);
+    </script>
+</body>
+</html>
