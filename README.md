@@ -4,13 +4,13 @@ A modern, full-stack appointment reminder system that sends automatic confirmati
 
 ## Features
 
-✅ **Appointment Booking**: Simple form to schedule appointments  
-✅ **Automatic Confirmations**: Send confirmation messages immediately after booking  
-✅ **Smart Reminders**: Automatic reminder messages within 1 hour of appointment  
-✅ **Live Dashboard**: Real-time view of all appointments with filtering  
-✅ **Multi-Channel**: Support for WhatsApp Cloud API, Twilio SMS, or simulated mode  
-✅ **Database**: Supabase for persistent storage  
-✅ **Responsive Design**: Works on desktop, tablet, and mobile  
+**Appointment Booking**: Simple form to schedule appointments  
+**Automatic Confirmations**: Send confirmation messages immediately after booking  
+**Smart Reminders**: Automatic reminder messages within 1 hour of appointment  
+**Live Dashboard**: Real-time view of all appointments with filtering  
+**Multi-Channel**: Support for WhatsApp Cloud API, Twilio SMS, or simulated mode  
+**Database**: Supabase for persistent storage  
+**Responsive Design**: Works on desktop, tablet, and mobile  
 
 ## Tech Stack
 
@@ -21,253 +21,145 @@ A modern, full-stack appointment reminder system that sends automatic confirmati
 
 **Frontend:**
 - HTML5
-- CSS3 (Modern responsive design)
-- Vanilla JavaScript (No dependencies)
+- CSS3 
+- JavaScript 
 
-**Messaging:**
-- WhatsApp Cloud API
-- Twilio SMS API
-- Simulated mode for testing
-
-## Installation
+## Render Deployment
 
 ### Prerequisites
-- Python 3.8+
-- pip (Python package manager)
+- Render account (https://render.com)
+- Git repository (GitHub)
+- Environment variables configured
 
-### Steps
+### Environment Variables
+Set these variables in Render dashboard:
 
-1. **Clone or download the project**
+```
+DATABASE_URL=postgresql://...
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_KEY=your_anon_key
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+WHATSAPP_API_URL=https://graph.instagram.com/v18.0/
+WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+WHATSAPP_BUSINESS_ACCOUNT_ID=your_business_account_id
+WHATSAPP_ACCESS_TOKEN=your_access_token
+APP_DEBUG=False
+REMINDER_ENABLED=True
+REMINDER_CHECK_INTERVAL=60
+REMINDER_THRESHOLD_MINUTES=60
+```
+
+### Deployment Steps
+
+1. **Push to GitHub**
    ```bash
-   cd appointment-reminder
+   git push origin main
    ```
 
-2. **Create a virtual environment** (recommended)
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+2. **Connect to Render**
+   - Go to https://dashboard.render.com
+   - Click "New +" → "Web Service"
+   - Select your GitHub repository
+   - Fill in the following:
+     - **Name**: appointment-reminder (or your preferred name)
+     - **Environment**: Python 3
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `gunicorn -w 4 -b 0.0.0.0:$PORT app:app`
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. **Configure Environment Variables**
+   - In Render dashboard, go to Service → Environment
+   - Add all environment variables from the list above
+   - Set `Python Version` to `3.11` (optional, in Advanced settings)
 
-4. **Configure environment variables**
-   ```bash
-   cp .env .env.local
-   # Edit .env.local with your API credentials
-   ```
+4. **Deploy**
+   - Render will automatically deploy when you connect
+   - Monitor deployment in the "Logs" tab
 
-5. **Run the application**
-   ```bash
-   python app.py
-   ```
+### Important Notes
 
-6. **Access the application**
-   Open your browser and navigate to: `http://localhost:8000`
+- **Background Scheduler**: The APScheduler runs within the FastAPI service and will be active as long as the service is running. Note that Render may restart services periodically, which will restart the scheduler.
 
-## Configuration
+- **Production Database**: Use Supabase PostgreSQL for production deployments instead of SQLite
 
-### Using WhatsApp Cloud API
+- **Static Files**: Static files are served from the `static/` directory automatically
 
-1. Get your credentials from [Meta for Developers](https://developers.facebook.com/)
-2. Update `.env`:
-   ```env
-   WHATSAPP_API_URL=https://graph.instagram.com/v18.0/
-   WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id_here
-   WHATSAPP_BUSINESS_ACCOUNT_ID=your_business_account_id_here
-   WHATSAPP_ACCESS_TOKEN=your_access_token_here
-   ```
+- **Templates**: HTML templates are served from the `templates/` directory
 
-### Using Twilio SMS
+- **Health Check**: Use the `/api/health` endpoint to monitor service status
 
-1. Sign up at [Twilio](https://www.twilio.com/)
-2. Update `.env`:
-   ```env
-   TWILIO_ACCOUNT_SID=your_account_sid_here
-   TWILIO_AUTH_TOKEN=your_auth_token_here
-   TWILIO_PHONE_NUMBER=+1234567890
-   ```
-
-### Testing Mode (No API Required)
-
-The system will automatically simulate message sending if no API credentials are configured. Messages are logged to the console.
-
-## Project Structure
-
-```
-appointment-reminder/
-│
-├── app.py                    # Main FastAPI application
-├── config.py                 # Configuration and settings
-├── requirements.txt          # Python dependencies
-├── .env                      # Environment variables (template)
-│
-├── templates/
-│   ├── index.html           # Appointment booking form
-│   └── dashboard.html       # Appointments dashboard
-│
-├── static/
-│   ├── style.css            # Styling
-│   └── script.js            # Frontend logic
-│
-├── services/
-│   ├── database_service.py  # Database operations
-│   └── message_service.py   # WhatsApp/SMS sending
-│
-├── scheduler/
-│   └── reminder_scheduler.py # Automatic reminder scheduler
-│
-└── README.md               # This file
-```
-
-## API Endpoints
-
-### Appointments
-
-- `GET /` - Booking form page
-- `GET /dashboard` - Dashboard page
-- `POST /api/appointments` - Create appointment
-- `GET /api/appointments` - Get all appointments
-- `GET /api/appointments/{id}` - Get specific appointment
-- `DELETE /api/appointments/{id}` - Delete appointment
-- `POST /api/reminders/{id}/send-now` - Send manual reminder
-
-### Health
-
-- `GET /api/health` - Health check
-
-## How It Works
-
-### 1. Booking Flow
-```
-User fills form → Submit → API creates appointment → 
-Send confirmation message → Show success page → 
-Redirect to dashboard
-```
-
-### 2. Automatic Reminder Flow
-```
-APScheduler checks every 60 seconds → 
-Find appointments within 1 hour → 
-Send reminder message → 
-Mark as sent in database
-```
-
-### 3. Data Flow
-```
-Frontend (HTML/JS) → FastAPI Backend → Database (Supabase)
-                 → Message Service (WhatsApp/SMS)
-Frontend (Dashboard) ← API (JSON) ← Database
-```
-
-## Usage
-
-### Book an Appointment
-1. Go to the home page
-2. Fill in your name, phone number, and appointment time
-3. Click "Book Appointment"
-4. Receive confirmation via WhatsApp/SMS
-5. Get automatic reminder 1 hour before
-
-### View Dashboard
-1. Click "View Dashboard"
-2. See all appointments with their status
-3. Filter by name, phone, or status
-4. Send manual reminders if needed
-5. Delete appointments
-
-## Development
-
-### Adding New Features
-
-**Database Changes:**
-- Edit `services/database_service.py`
-- Update `init_db()` method
-
-**API Routes:**
-- Add new routes in `app.py`
-- Use existing services for database/messaging
-
-**Frontend Changes:**
-- Update `templates/*.html` for markup
-- Modify `static/style.css` for styling
-- Update `static/script.js` for interactivity
-
-### Running in Development
+### Local Development
 
 ```bash
-# With auto-reload
-uvicorn app:app --reload
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Or run directly
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# Run application
 python app.py
+# or
+uvicorn app:app --reload
 ```
 
-## Troubleshooting
+### Troubleshooting
 
-### Messages not sending
-- Check `.env` file for correct API credentials
-- Verify phone number format (include country code)
-- Check console for error messages
-- Try simulated mode first (just comment out credentials)
+- **Port Issues**: Render dynamically assigns port via `$PORT` environment variable (handled by render.yaml)
+- **Static files not found**: Ensure paths in templates are absolute or relative to project root
+- **Database connection**: Verify DATABASE_URL is correct in Render environment
+- **Module import errors**: Check that all service modules are in correct directories
+- **Reminders not running**: Verify REMINDER_ENABLED=True in environment variables
 
-### Database errors
-- Delete `appointments.db` to reset database
-- Ensure write permissions in directory
+### File Structure
 
-### Port already in use
-```bash
-# Change port in app.py or use:
-python app.py --port 8080
+```
+appointment/
+├── api/
+│   └── index.py          # Backward compatibility
+├── services/
+│   ├── __init__.py
+│   ├── database_service.py
+│   └── message_service.py
+├── scheduler/
+│   ├── __init__.py
+│   └── reminder_scheduler.py
+├── static/
+│   ├── script.js
+│   └── style.css
+├── templates/
+│   ├── index.html
+│   └── dashboard.html
+├── app.py                # Main FastAPI application
+├── config.py             # Configuration
+├── requirements.txt      # Python dependencies
+├── render.yaml          # Render configuration
+├── .gitignore
+├── .env.example
+└── README.md
 ```
 
-## Performance & Scalability
+### Monitoring and Logs
 
-**Current Setup:**
-- Supabase database (suitable for production and serverless deployments)
-- APScheduler (in-memory job scheduler)
-- Single-threaded FastAPI server
+- Monitor your deployment in Render dashboard: https://dashboard.render.com
+- View logs in the "Logs" tab of your service
+- Use `/api/health` endpoint to verify service is running
 
-**For Production:**
-- Migrate to PostgreSQL
-- Use Celery + Redis for job queue
-- Deploy with Gunicorn/Docker
-- Add caching layer (Redis)
+### Custom Domain
 
-## Security Considerations
+To add a custom domain:
+1. Go to Render dashboard → Your Service → Settings
+2. Under "Custom Domain", enter your domain
+3. Follow DNS configuration instructions
+4. Wait for SSL certificate generation (usually instant)
+ 
 
-- Keep API tokens secure (use `.env` file, never commit to git)
-- Validate all user inputs
-- Use HTTPS in production
-- Implement rate limiting
-- Add authentication for admin endpoints
 
-## License
 
-MIT License - Feel free to use and modify
-
-## Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review API documentation
-3. Check console logs for errors
-
-## Future Enhancements
-
-- [ ] SMS as fallback when WhatsApp fails
-- [ ] Appointment cancellation/rescheduling
-- [ ] Email notifications
-- [ ] Calendar integration
-- [ ] Multi-language support
-- [ ] Admin dashboard
-- [ ] Analytics and reporting
-- [ ] Appointment duration/notes
-- [ ] Customer feedback system
-- [ ] Integration with booking platforms
-
----
-
-**Built with ❤️ using FastAPI and modern web technologies**
