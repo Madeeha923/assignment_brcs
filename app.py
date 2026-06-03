@@ -11,15 +11,17 @@ from contextlib import asynccontextmanager
 
 from services.database_service import DatabaseService
 from services.message_service import MessageService
-from scheduler.reminder_scheduler import reminder_scheduler
+from scheduler import reminder_scheduler as reminder_scheduler_module
+from scheduler.reminder_scheduler import ReminderScheduler
 from config import DEBUG, REMINDER_THRESHOLD_MINUTES
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize services
-db_service = DatabaseService()
+# Global service instances (initialized at startup)
+db_service = None
+reminder_scheduler = None
 
 # Pydantic models
 class AppointmentCreate(BaseModel):
@@ -43,12 +45,27 @@ class AppointmentResponse(BaseModel):
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
     # Startup
-    logger.info("Starting Appointment Reminder System...")
-    reminder_scheduler.start()
+    global db_service, reminder_scheduler
+    try:
+        logger.info("Initializing services...")
+        db_service = DatabaseService()
+        reminder_scheduler = ReminderScheduler()
+        
+        logger.info("Starting Appointment Reminder System...")
+        reminder_scheduler.start()
+    except Exception as e:
+        logger.error(f"Failed to initialize services: {str(e)}", exc_info=True)
+        raise
+    
     yield
+    
     # Shutdown
     logger.info("Shutting down Appointment Reminder System...")
-    reminder_scheduler.stop()
+    try:
+        if reminder_scheduler:
+            reminder_scheduler.stop()
+    except Exception as e:
+        logger.error(f"Error during shutdown: {str(e)}", exc_info=True)
 
 
 # FastAPI app with lifespan

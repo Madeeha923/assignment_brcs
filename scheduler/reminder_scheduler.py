@@ -81,5 +81,5 @@ class ReminderScheduler:
             logger.error(f"Error sending reminder: {str(e)}")
 
 
-# Global scheduler instance
-reminder_scheduler = ReminderScheduler()
+# Lazy initialization - will be created in app startup
+reminder_scheduler = None
