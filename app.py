@@ -11,7 +11,6 @@ from contextlib import asynccontextmanager
 
 from services.database_service import DatabaseService
 from services.message_service import MessageService
-from scheduler import reminder_scheduler as reminder_scheduler_module
 from scheduler.reminder_scheduler import ReminderScheduler
 from config import DEBUG, REMINDER_THRESHOLD_MINUTES
 
